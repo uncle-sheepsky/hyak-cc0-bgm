@@ -1,70 +1,56 @@
-# Hyak ep6 BGM 풀버전 — 2048 퍼즐 편. 210BPM, 140마디(4/4) = 160.000s.
-#   숏폼(build_track_ep6.py)의 음악 DNA를 유지하되, 영상 싱크(나레이션·CD 로딩바·드롭 프레임)를
-#   버리고 **완결형 곡 구조**로 재편곡. 구조 뼈대는 ep3 풀버전 템플릿에서 계승:
-#   인트로-빌드-버스A-코러스A-브레이크1-빌드2-코러스B-버스B-브레이크2-빌드3-파이널-아웃트로.
-#   ★ep6 정체성 보존:
-#     - 화성 Am–G–F–E (4음 8va 와이드 보이싱, 하모닉마이너 V=E[G#]), 후반 1/3 +2반음 키업.
-#     - 벨 리드(pluck_arp) 하강 가이드톤 컨투어 BELL.
-#     - 슈퍼소 코드찹(FB 게이트) + pad/reverb 앰비언트 베드.
-#     - load_blip(고속감쇠 사인+옥타브 배음) = 퍼즐 모티프 → 빌드 구간 시그니처 ARP/악센트
-#       (단 영상싱크 로딩바 기믹 아님, 순수 음악 모티프).
-#   ep3 화성(Dm–Bb–C–A)은 사용하지 않음 — 이 곡은 ep6처럼 들려야 함.
-#   루프 아님 → 자연스러운 엔딩. 순수 hyak_synth 코드합성(외부 wav 0, CC0).
+# Hyak ep6 BGM 풀버전 — 은하 충돌(galaxy collision) 편. 210BPM, 140마디(4/4) = 160.000s.
+#   숏폼(ep6 v3 40s)의 음악 DNA(王道진행 Royal Road FM7add9–G7add9–Em7add9–Am7add9, F장조/Am 귀결 +
+#     벨 리드 하강폭포 + 와이드 7th/9th 코드찹 + 엠비언트 패드 베드 상시 + Schroeder 리버브 + 뒤 1/3 +2 키업)를
+#     그대로 계승하되, 영상 싱크(seam·나레이션 진입·드롭 프레임)를 버리고 **완결형 곡 구조**로 재편곡.
+#   구조: 인트로-빌드-버스A-코러스A-브레이크1-빌드2-코러스B-버스B-브레이크2-빌드3-파이널-아웃트로.
+#   루프 아님 → half-open 블립마스킹 대신 자연스러운 엔딩. 순수 hyak_synth 코드합성(외부샘플 0, CC0).
+#   ★캐릭터 = COSMIC / royal-road / ambient (NOT ep3 하드스타일). 벨·패드·리버브가 전경, 하드킥은 리듬 엔진.
 import numpy as np, sys, os, wave
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '음원'))
 from hyak_synth import (SR, m2f, adsr, lp, hp, soft_clip, sub_bass, super_saw_lead,
-                        pluck_arp, hard_kick, clap, closed_hat, bleat_hit, noise_riser,
-                        noise_impact, sidechain_env, limiter)
+                        pluck_arp, hard_kick, clap, closed_hat, noise_riser, noise_impact,
+                        sidechain_env, limiter)
 
 BPM = 210.0
-BEAT = 60.0 / BPM              # 0.285714s
-BAR = BEAT * 4                 # 1.142857s
+BEAT = 60.0 / BPM
+BAR = BEAT * 4                 # 60/210*4 = 1.142857142857s
 N_BARS = 140
 DUR = BAR * N_BARS             # 160.000000s
-N = int(round(DUR * SR))       # 7,056,000
-assert N == 7056000, N
+N = int(round(DUR * SR))       # 7,056,000 spl
+assert N == 7056000, (N, DUR, BAR)
 print(f"[i] ep6 fullver BPM={BPM} beat={BEAT:.6f}s bar={BAR:.6f}s dur={DUR:.6f}s N={N}")
 RNG = np.random.default_rng(20260711)
 
-mix = np.zeros(N)       # 드럼 + fx(비-덕킹)
-melodic = np.zeros(N)   # 베이스 + 리드 + 코드찹 + 블립(사이드체인 덕킹)
-amb = np.zeros(N)       # 앰비언트 패드 베드(리버브 대상, 약펌프)
-kick_times = []
-
+# ── place / bar_time 헬퍼 (템플릿 계승; sub = 8분음표 단위 = BEAT/2) ──────────
 def place(buf, sig, t):
     i0 = int(round(t * SR)); i1 = min(N, i0 + len(sig))
     if i0 < N and i1 > i0: buf[i0:i1] += sig[:i1 - i0]
-def bar_time(bar, sub=0): return bar * BAR + sub * (BEAT / 2.0)   # sub = 8분 인덱스
-def bt(bar, beat=0.0): return bar * BAR + beat * BEAT            # beat = 4분(소수 허용)
+def bar_time(bar, sub=0): return bar * BAR + sub * (BEAT / 2.0)
 
-# ── 음악 DNA (숏폼 build_track_ep6서 계승) ─────────────────────────────────
-#   王道진행 파생 Am–G–F–E: vim7 귀결(단조 중력)+하모닉마이너 V(E=G#) 색채.
+# ── 화성 (ep6 계승: 王道진행 Royal Road IVM7–V7–iiim7–vim7, F장조/Am 귀결) ────
+#   7th/9th 와이드 보이싱 = bittersweet 코스믹 정석(트라이어드 아님). vim7(Am7)로 귀결 = 단조 중력+장조 색채.
 CHORDS = [
-    {"root": 45, "tones": [69, 72, 76, 81]},   # Am add8va (A C E A)
-    {"root": 43, "tones": [67, 71, 74, 79]},   # G  (G B D G)
-    {"root": 41, "tones": [65, 69, 72, 77]},   # F  (F A C F)
-    {"root": 40, "tones": [64, 68, 71, 76]},   # E  (E G# B E) — 하모닉마이너 V
+    {"root": 41, "tones": [65, 69, 72, 76, 79]},   # FM7add9  (F A C E G)
+    {"root": 43, "tones": [67, 71, 74, 77, 81]},   # G7add9   (G B D F A)
+    {"root": 40, "tones": [64, 67, 71, 74, 78]},   # Em7add9  (E G B D F#)
+    {"root": 45, "tones": [69, 72, 76, 79, 83]},   # Am7add9  (A C E G B)
 ]
-KEYUP_FROM = 100                # ★파이널(후반 1/3)부터 +2반음 키업 = 상승·승리 밝음
+# ★뒤 1/3(파이널) +2반음 키업(J-pop/전파 리프트) = 상승감 + 지문 이동
+KEYUP_FROM = 100                # 파이널 코러스(100~135) = 곡 뒤 1/3
 def _kup(bar): return 2 if bar >= KEYUP_FROM else 0
 def ch(bar):
     c = CHORDS[bar % 4]; k = _kup(bar)
     return {"root": c["root"] + k, "tones": [t + k for t in c["tones"]]}
 
-# 벨 리드 = 하강 가이드톤 컨투어(코드톤 관통, 정본 아치 회피)
-BELL = [76, 74, 72, 71, 74, 72, 71, 69]     # E D C B / D C B A
-# load_blip 퍼즐 모티프용 A 하모닉마이너 상승 스케일
-BLIP_SCALE = [69, 71, 72, 74, 76, 77, 80, 81]   # A B C D E F G# A
-
-# ── ep6 커스텀 신스(verbatim 계승) ────────────────────────────────────────
+# ── 엠비언트 베드용 신스 (ep6 v3서 verbatim: 디튠 정적 소 패드 — LFO/비브라토 없음=울렁 X) ──
 def pad(midi, dur, amp=0.4, a=0.5, r=0.8, fc=2400, warm=True):
-    """디튠 소 앙상블 패드. LFO/비브라토 없음(정적 디튠만 = 아날로그 온기)."""
+    """디튠 소 앙상블 패드. LFO/비브라토 없음(정적 디튠만 = 아날로그 온기, 울렁 X)."""
     n = int(dur * SR); t = np.arange(n) / SR; f = m2f(midi); s = np.zeros(n)
-    for dc in (-6, -2.5, 0, 2.5, 6):
+    for dc in (-6, -2.5, 0, 2.5, 6):                 # 완만 정적 디튠(비브라토 아님)
         ff = f * 2 ** (dc / 1200.0); ph = RNG.random()
         s += 2.0 * ((ff * t + ph) % 1.0) - 1.0
     s /= 5.0
-    if warm:
+    if warm:                                          # 저역 배음 보강(따뜻한 몸통, 사인 아님=삼각 근사 소프트클립)
         s = s * 0.8 + soft_clip(s, 1.15) * 0.2
     s = lp(s, fc, order=4)
     return (s * adsr(n, a, 0.2, 0.8, r, sus=0.8) * amp)[:n]
@@ -75,8 +61,8 @@ def tick(dur=0.09, amp=0.4, freq=1900):
     click = RNG.standard_normal(n) * np.exp(-t * 400) * 0.4
     return hp(body + click, 900, order=2) * amp
 
+# ── 간이 리버브(Schroeder: 4콤브+2올패스) = 엠비언트 우주 공간감 (ep6 v3서 verbatim) ──
 def reverb(x, mix=0.28, decay=0.72):
-    """간이 Schroeder(4콤브+2올패스) = 앰비언트 공간감. 저레벨 베드에만 적용."""
     combs = [(1687, decay), (1601, decay - 0.02), (2053, decay - 0.04), (2251, decay - 0.06)]
     out = np.zeros_like(x)
     for d, g in combs:
@@ -85,252 +71,250 @@ def reverb(x, mix=0.28, decay=0.72):
             v = x[i] + g * buf[i % d]; buf[i % d] = v; y[i] = v
         out += y
     out /= len(combs)
-    for d, g in [(389, 0.7), (127, 0.7)]:
+    for d, g in [(389, 0.7), (127, 0.7)]:               # 올패스
         y = np.zeros_like(out); buf = np.zeros(d)
         for i in range(len(out)):
-            bv = buf[i % d]; v = out[i] + (-g) * bv; buf[i % d] = v; y[i] = g * v + bv
+            bv = buf[i % d]; v = out[i] + (-g) * bv; buf[i % d] = v + 0 * bv; y[i] = g * v + bv
         out = y
     return x * (1 - mix) + out * mix
 
-def load_blip(freq, dur=0.05, amp=0.2):
-    """로딩 블립 = 고속감쇠 사인 + 옥타브/3배음(게임 블립). ep6 시그니처."""
-    n = int(dur * SR); t = np.arange(n) / SR
-    s = np.sin(2 * np.pi * freq * t) * np.exp(-t * 52)
-    s += np.sin(2 * np.pi * freq * 2 * t) * np.exp(-t * 70) * 0.55
-    s += np.sin(2 * np.pi * freq * 3 * t) * np.exp(-t * 90) * 0.25
-    return hp(s * amp, 300, order=2)
+# ── 퓨처베이스/코스믹 코드찹(와이드 9th, 싱코 게이트) — ep6 지문 게이트 ────────
+FB_PAT = [1, 0, 1, 0, 1, 1, 0, 1]                        # ★ep6 게이트
+def lay_fb_chop(buf, bar, amp=0.5, bright=8800, closed=False):
+    c = ch(bar); voic = c["tones"]                        # 7th/9th 와이드 보이싱(이미 5음)
+    for sub in range(8):
+        if not FB_PAT[sub]: continue
+        t0 = bar_time(bar, sub)                            # sub = 8분음표 인덱스
+        dur = (BEAT / 2) * 0.95
+        for m_ in voic:
+            s_ = super_saw_lead(m2f(m_), dur, amp=amp / len(voic), bright=(900 if closed else bright))
+            env = adsr(len(s_), 0.004, 0.05, 0.6, 0.06, sus=0.6)   # 릴리즈컷(게이트 느낌)
+            place(buf, s_[:len(env)] * env, t0)
+            if not closed:                                # +1옥타브 에어
+                sa = super_saw_lead(m2f(m_ + 12), dur, amp=amp * 0.14 / len(voic), bright=9500)
+                place(buf, sa, t0)
 
-# ── 슈퍼소 코드찹(와이드 보이싱, FB 싱코 게이트) ──────────────────────────
-FB_PAT = [1, 1, 1, 0, 1, 1, 1, 1]           # ep6 셔플 게이트
-def lay_chop(bars, amp=0.5, bright=8800, closed=False, air=True):
+# ── 벨 리드 하강폭포 라인 (ep6 계승: 코드톤 관통 하강, 정본 아치 회피) ──────────
+BELL = [76, 74, 72, 71, 74, 72, 71, 69]     # E D C B / D C B A 하강 라인
+def lay_bell(bars, amp=0.20, dense=False, oct_up=12):
     for bar in bars:
-        voic = ch(bar)["tones"]
-        for sub in range(8):
-            if not FB_PAT[sub]: continue
-            t0 = bt(bar, (sub >> 1) + (sub & 1) * (2 / 3))    # 스윙 8분(오프비트 2/3)
-            dur = (BEAT / 2) * 0.95
-            for m_ in voic:
-                s_ = super_saw_lead(m2f(m_), dur, amp=amp / len(voic),
-                                    bright=(900 if closed else bright))
-                env = adsr(len(s_), 0.004, 0.05, 0.6, 0.06, sus=0.6)
-                place(melodic, s_[:len(env)] * env, t0)
-                if air and not closed:
-                    sa = super_saw_lead(m2f(m_ + 12), dur, amp=amp * 0.14 / len(voic), bright=9500)
-                    place(melodic, sa, t0)
+        steps = 8 if dense else 4
+        for q in range(steps):
+            mi = BELL[(bar * steps + q) % len(BELL)]
+            dur = (BEAT / 2 if dense else BEAT) * 0.9
+            place(lead, pluck_arp(m2f(mi + oct_up + _kup(bar)), dur, amp=amp),
+                  bar_time(bar, q * (1 if dense else 2)))
 
-# ── 드럼·베이스·리드·앰비언트 레이어 헬퍼 (ep3 형태 계승) ─────────────────
-def lay_drums(bars, kamp=0.85, hat=0.12, with_clap=True, four_floor=True, hseed=200):
-    for bar in bars:
-        if four_floor:
-            for beat in range(4):
-                tk = bar_time(bar, beat * 2)
-                place(mix, hard_kick(amp=kamp, punch=55), tk); kick_times.append(tk)
-        else:
-            for beat in (0, 2):
-                tk = bar_time(bar, beat * 2)
-                place(mix, hard_kick(amp=kamp * 0.9, punch=55), tk); kick_times.append(tk)
-        for e in range(8):
-            place(mix, closed_hat(amp=hat, seed=hseed + bar * 8 + e), bar_time(bar, e))
-        if with_clap:
-            place(mix, clap(amp=0.44, seed=300 + bar), bar_time(bar, 2))
-            place(mix, clap(amp=0.44, seed=340 + bar), bar_time(bar, 6))
+# ═══ 레이어 버퍼 ═══════════════════════════════════════════════════════
+amb = np.zeros(N); fb = np.zeros(N); lead = np.zeros(N); sub = np.zeros(N)
+drums = np.zeros(N); fx = np.zeros(N); kick_times = []
 
-def lay_halftime(bars, kamp=0.8):
-    for bar in bars:
-        tk = bar_time(bar, 0); place(mix, hard_kick(amp=kamp, drive=1.2, punch=52), tk); kick_times.append(tk)
-        place(mix, clap(amp=0.34, seed=360 + bar), bar_time(bar, 4))
-
-def lay_bass(bars, amp=0.85, whole=False, drive=1.4):
+def four_on_floor(bar, kamp=0.8, punch=55):
+    for b in range(4):
+        tk = bar_time(bar, b * 2); place(drums, hard_kick(0.24, amp=kamp, punch=punch), tk); kick_times.append(tk)
+def halftime_kick(bar, kamp=0.72):
+    for b in (0, 2):
+        tk = bar_time(bar, b * 2); place(drums, hard_kick(0.26, amp=kamp, punch=52, drive=1.3), tk); kick_times.append(tk)
+def claps(bar, amp=0.44):
+    place(drums, clap(amp=amp, seed=300 + bar), bar_time(bar, 2))
+    place(drums, clap(amp=amp, seed=340 + bar), bar_time(bar, 6))
+def hats(bar, amp=0.12, n=8):
+    for r in range(n): place(drums, closed_hat(amp=amp, seed=500 + bar * 8 + r), bar_time(bar, r))
+def open_hats(bar, amp=0.30):
+    for e in (1, 3, 5, 7): place(drums, closed_hat(dur=0.11, amp=amp, seed=600 + bar * 8 + e), bar_time(bar, e))
+def lay_bass(bars, amp=0.55, whole=False, drive=1.4):
     for bar in bars:
         f = m2f(ch(bar)["root"])
         if whole:
-            place(melodic, sub_bass(f, BAR * 0.97, amp=amp, drive=drive), bar_time(bar))
+            place(sub, sub_bass(f, BAR * 0.98, amp=amp, drive=drive), bar_time(bar))
         else:
-            for beat in range(4):
-                place(melodic, sub_bass(f, BEAT * 0.98, amp=amp, drive=drive), bar_time(bar, beat * 2))
-
-def lay_bell(bars, amp=0.20, octave=1):
-    """벨 리드 하강 가이드톤(pluck_arp) = ep6 리드 정체성. 4분 그리드."""
-    for bar in bars:
-        for q in range(4):
-            mi = BELL[(bar * 4 + q) % len(BELL)] + 12 * octave + _kup(bar)
-            place(melodic, pluck_arp(m2f(mi), BEAT * 0.9, amp=amp, bright=6200), bt(bar, q))
-
-def lay_open_hats(bars, amp=0.30):
-    for bar in bars:
-        for e in (1, 3, 5, 7):
-            place(mix, closed_hat(dur=0.11, amp=amp, seed=500 + bar * 8 + e), bar_time(bar, e))
-
-def lay_pad(bars, amp=0.40, ticks=False):
-    for bar in bars:
-        for mi in ch(bar)["tones"]:
-            place(amb, pad(mi, BAR * 0.98, amp=amp * 0.42, a=0.6, fc=1900), bt(bar))
-            place(amb, pad(mi + 12, BAR * 0.98, amp=amp * 0.26, a=0.8, fc=3000), bt(bar))
-        if ticks:
             for b in range(4):
-                place(amb, tick(amp=0.16), bt(bar, b))
+                place(sub, sub_bass(f, BEAT * 0.95, amp=amp, drive=drive), bar_time(bar, b * 2))
 
-def lay_break_motif(bars):
-    """브레이크다운: 벨 스퀘어 악센트(bleat) + 홀드 베이스로 숨쉬기."""
-    motif = [76, 72, 74, 71]
-    for k, bar in enumerate(bars):
-        deg = motif[k % 4] + _kup(bar)
-        place(melodic, bleat_hit(m2f(deg), BEAT * 1.6, amp=0.26), bar_time(bar, 0))
-        place(melodic, bleat_hit(m2f(deg - 5), BEAT * 1.2, amp=0.18), bar_time(bar, 4))
+# ── 엠비언트 패드 베드 (전 구간 상시; 섹션별 레벨만 조정 — ep6 정신) ──────────
+def amb_amp(bar):
+    if bar < 4:  return 0.44                 # 인트로 = 패드 전경
+    if bar in range(44, 52) or bar in range(88, 96): return 0.46   # 브레이크 = 엠비언트 부상
+    return 0.36
+def lay_amb(bars):
+    for bar in bars:
+        c = ch(bar); aa = amb_amp(bar)
+        for mi in c["tones"]:
+            place(amb, pad(mi, BAR * 0.98, amp=aa * 0.42, a=0.6, fc=1900), bar_time(bar))       # 하단 온기
+            place(amb, pad(mi + 12, BAR * 0.98, amp=aa * 0.26, a=0.8, fc=3000), bar_time(bar))   # 상단 에어
 
-def lay_blip_arp(bars, amp=0.30, dense=False, climb=True):
-    """★load_blip 퍼즐 모티프 = 빌드 구간 시그니처 ARP. 상승 스케일 = 긴장 축적.
-       16분(dense) 또는 8분 그리드로 BLIP_SCALE를 훑어 올라감(퍼즐 '틱업' 정취)."""
-    steps = 16 if dense else 8
-    grid = 0.25 if dense else 0.5     # 16분 / 8분 (BEAT 단위)
-    for j, bar in enumerate(bars):
-        for s in range(steps):
-            idx = (s + j * (steps // 2)) % len(BLIP_SCALE)
-            oct_up = 12 if (climb and s >= steps // 2) else 0
-            mi = BLIP_SCALE[idx] + oct_up + _kup(bar)
-            a = amp * (0.7 + 0.3 * s / steps)          # 마디 내 상승 크레셴도
-            place(melodic, load_blip(m2f(mi), dur=0.055, amp=a), bt(bar, s * grid))
+lay_amb(range(N_BARS))                        # ★패드 베드 = 전 140마디 상시
 
-# ══ 곡 구조 (140마디, 에너지 상승 + 브레이크 딥) ═══════════════════════════
-# 0-3 인트로 (앰비언트 페이드인)
-lay_pad(range(0, 4), amp=0.42, ticks=True)
-place(mix, noise_riser(BAR * 4, amp=0.42, fc_start=200, fc_end=5000, seed=11), bar_time(0))
-for b, deg in [(0, 74), (1, 76), (2, 77), (3, 81)]:
-    place(melodic, bleat_hit(m2f(deg), BEAT * 0.9, amp=0.18), bar_time(b, 0))
+# ═══ 곡 구조 (140마디, 210BPM) ═══════════════════════════════════════════
+# 0-3 인트로 (패드 + 벨 스파클 + 라이저)
+place(fx, noise_riser(BAR * 4, amp=0.42, fc_start=200, fc_end=5000, seed=11), bar_time(0))
+for b, deg in [(0, 76), (1, 79), (2, 81), (3, 83)]:
+    place(lead, pluck_arp(m2f(deg + 12), BEAT * 1.4, amp=0.16), bar_time(b, 0))
+for bar in range(0, 4):
+    for b in range(4): place(amb, tick(amp=0.14), bar_time(bar, b * 2))
 
-# 4-11 빌드 (드럼 진입 + load_blip 퍼즐 모티프 상승)
-lay_drums(range(4, 12), with_clap=False, four_floor=False, hat=0.10, kamp=0.78)
-lay_bass(range(4, 12), amp=0.62)
-lay_pad(range(4, 12), amp=0.30, ticks=True)
-lay_blip_arp(range(4, 12), amp=0.24, dense=False)
-lay_blip_arp(range(8, 12), amp=0.30, dense=True)          # 후반 가속
-place(mix, noise_riser(BAR * 4, amp=0.5, fc_start=300, fc_end=7000, seed=21), bar_time(8))
-place(mix, noise_impact(amp=0.6, seed=22), bar_time(12) - 0.02)
+# 4-11 빌드 (4온플로어 킥 진입 = 숏폼과 동일 · 코드찹 필터 오픈 · 벨 상승)
+for bar in range(4, 12):
+    g = (bar - 4) / 7.0
+    four_on_floor(bar, kamp=0.72 + 0.10 * g, punch=55)
+    hats(bar, amp=0.09 + 0.06 * g)
+    if bar >= 8: claps(bar, amp=0.34)
+    lay_fb_chop(fb, bar, amp=0.18 + 0.16 * g, bright=(3200 + 5000 * g), closed=(g < 0.5))
+    lay_bass([bar], amp=0.44 + 0.12 * g)
+lay_bell(range(4, 12), amp=0.16, dense=False)
+place(fx, noise_impact(0.6, amp=0.6, seed=21), bar_time(12) - 0.02)
 
-# 12-27 버스A ×4 (벨 리드 주도, 코드찹 은은, 4온플로어)
-lay_drums(range(12, 28), hat=0.11)
-lay_bass(range(12, 28), amp=0.82)
-lay_bell(range(12, 28), amp=0.22)
-lay_chop(range(12, 28), amp=0.24, bright=4200, closed=True, air=False)
-lay_pad(range(12, 28), amp=0.20)
+# 12-27 버스A/플로어 (벨 전경 · 하프타임 킥 · 코드찹 은은 · 엠비언트 부각)
+for bar in range(12, 28):
+    halftime_kick(bar, kamp=0.70)
+    claps(bar, amp=0.40)
+    hats(bar, amp=0.10)
+    lay_fb_chop(fb, bar, amp=0.20, bright=3600, closed=True)
+lay_bass(range(12, 28), amp=0.48)
+lay_bell(range(12, 28), amp=0.19, dense=False)
 
-# 28-43 코러스A ×4 (풀 코드찹 + 벨 + 오픈햇)
-lay_drums(range(28, 44), hat=0.13)
-lay_bass(range(28, 44), amp=0.9)
-lay_chop(range(28, 44), amp=0.50, bright=8600)
-lay_bell(range(28, 44), amp=0.20)
-lay_open_hats(range(28, 44), amp=0.30)
-lay_pad(range(28, 44), amp=0.18)
+# 28-43 코러스A (풀 4온플로어 · 코드찹 밝게 · 벨 하강폭포 밀도 · 오픈햇)
+for bar in range(28, 44):
+    four_on_floor(bar, kamp=0.84, punch=55)
+    claps(bar, amp=0.46)
+    hats(bar, amp=0.14); open_hats(bar, amp=0.30)
+    lay_fb_chop(fb, bar, amp=0.50, bright=8600)
+lay_bass(range(28, 44), amp=0.56)
+lay_bell(range(28, 44), amp=0.22, dense=True)
 
-# 44-51 브레이크1 (하프타임, 숨쉬기 — 코러스 아래로 딥)
-lay_halftime(range(44, 52))
-lay_bass(range(44, 52), amp=0.5, whole=True)
-lay_break_motif(range(44, 52))
-lay_pad(range(44, 52), amp=0.40, ticks=True)
+# 44-51 브레이크1 (엠비언트 브레이크다운 · 하프타임 · 코드찹/킥 후퇴 = 谷)
+for bar in range(44, 52):
+    if bar % 2 == 0:
+        tk = bar_time(bar, 0); place(drums, hard_kick(0.26, amp=0.5, punch=50, drive=1.2), tk); kick_times.append(tk)
+    place(drums, clap(amp=0.26, seed=360 + bar), bar_time(bar, 4))
+lay_bass(range(44, 52), amp=0.42, whole=True)
+lay_bell(range(44, 52), amp=0.16, dense=False, oct_up=12)
 
-# 52-55 빌드2 (짧은 재점화 + 블립)
-lay_drums(range(52, 56), with_clap=False, four_floor=False, hat=0.11)
-lay_bass(range(52, 56), amp=0.7)
-lay_blip_arp(range(52, 56), amp=0.30, dense=True)
-place(mix, noise_riser(BAR * 4, amp=0.58, fc_start=350, fc_end=8500, seed=41), bar_time(52))
-place(mix, noise_impact(amp=0.72, seed=42), bar_time(56) - 0.02)
+# 52-55 빌드2 (라이저 + 코드찹 필터 오픈)
+for bar in range(52, 56):
+    g = (bar - 52) / 3.0
+    four_on_floor(bar, kamp=0.72 + 0.10 * g)
+    hats(bar, amp=0.10 + 0.06 * g)
+    lay_fb_chop(fb, bar, amp=0.24 + 0.18 * g, bright=(4000 + 5000 * g), closed=(g < 0.4))
+    lay_bass([bar], amp=0.5)
+place(fx, noise_riser(BAR * 4, amp=0.55, fc_start=300, fc_end=8500, seed=41), bar_time(52))
+place(fx, noise_impact(0.7, amp=0.72, seed=42), bar_time(56) - 0.02)
 
-# 56-71 코러스B ×4 (에너지 상향)
-lay_drums(range(56, 72), hat=0.14)
-lay_bass(range(56, 72), amp=0.94)
-lay_chop(range(56, 72), amp=0.55, bright=9000)
-lay_bell(range(56, 72), amp=0.22)
-lay_open_hats(range(56, 72), amp=0.33)
-lay_pad(range(56, 72), amp=0.16)
+# 56-71 코러스B (최대 전 최고조 · 코드찹 최밝 · 벨 밀도 · 에어)
+for bar in range(56, 72):
+    four_on_floor(bar, kamp=0.88, punch=55)
+    claps(bar, amp=0.48)
+    hats(bar, amp=0.15); open_hats(bar, amp=0.32)
+    lay_fb_chop(fb, bar, amp=0.54, bright=9000)
+lay_bass(range(56, 72), amp=0.60)
+lay_bell(range(56, 72), amp=0.24, dense=True)
 
-# 72-87 버스B ×4 (리드 옥타브 낮춰 대비 + 블립 악센트)
-lay_drums(range(72, 88), hat=0.12)
-lay_bass(range(72, 88), amp=0.84)
-lay_bell(range(72, 88), amp=0.20, octave=0)
-lay_chop(range(72, 88), amp=0.26, bright=4600, closed=True, air=False)
-lay_blip_arp(range(80, 88), amp=0.18, dense=False)        # 인터루드 텍스처
-lay_pad(range(72, 88), amp=0.18)
+# 72-87 버스B/인터루드 (벨 하강 대비 · 코드찹 후퇴 · 밀도 감)
+for bar in range(72, 88):
+    four_on_floor(bar, kamp=0.76)
+    claps(bar, amp=0.40)
+    hats(bar, amp=0.12)
+    lay_fb_chop(fb, bar, amp=0.30, bright=6000, closed=(bar % 4 < 2))
+lay_bass(range(72, 88), amp=0.52)
+lay_bell(range(72, 88), amp=0.20, dense=False)
 
-# 88-95 브레이크2 (하프타임 딥)
-lay_halftime(range(88, 96))
-lay_bass(range(88, 96), amp=0.5, whole=True)
-lay_break_motif(range(88, 96))
-lay_pad(range(88, 96), amp=0.40, ticks=True)
+# 88-95 브레이크2 (엠비언트 브레이크다운 = 谷)
+for bar in range(88, 96):
+    if bar % 2 == 0:
+        tk = bar_time(bar, 0); place(drums, hard_kick(0.26, amp=0.5, punch=50, drive=1.2), tk); kick_times.append(tk)
+    place(drums, clap(amp=0.26, seed=360 + bar), bar_time(bar, 4))
+lay_bass(range(88, 96), amp=0.42, whole=True)
+lay_bell(range(88, 96), amp=0.16, dense=False)
 
-# 96-99 빌드3 (최종 프리드롭, 블립 최대 가속)
-lay_drums(range(96, 100), with_clap=False, four_floor=False, hat=0.13)
-lay_bass(range(96, 100), amp=0.75)
-lay_blip_arp(range(96, 100), amp=0.34, dense=True)
-place(mix, noise_riser(BAR * 4, amp=0.65, fc_start=400, fc_end=9500, seed=93), bar_time(96))
-place(mix, noise_impact(amp=0.82, seed=94), bar_time(100) - 0.02)
+# 96-99 빌드3 (최종 라이저)
+for bar in range(96, 100):
+    g = (bar - 96) / 3.0
+    four_on_floor(bar, kamp=0.74 + 0.12 * g)
+    hats(bar, amp=0.10 + 0.08 * g)
+    lay_fb_chop(fb, bar, amp=0.26 + 0.20 * g, bright=(4200 + 5200 * g), closed=(g < 0.4))
+    lay_bass([bar], amp=0.52)
+place(fx, noise_riser(BAR * 4, amp=0.62, fc_start=350, fc_end=9500, seed=93), bar_time(96))
+place(fx, noise_impact(0.8, amp=0.8, seed=94), bar_time(100) - 0.02)
 
-# 100-135 파이널 ×9 (최대 에너지, +2반음 키업 = 상승·승리, 36마디)
-lay_drums(range(100, 136), hat=0.15, kamp=0.9)
-lay_bass(range(100, 136), amp=0.98)
-lay_chop(range(100, 136), amp=0.58, bright=9400)
-lay_bell(range(100, 136), amp=0.24)
-lay_open_hats(range(100, 136), amp=0.35)
-lay_pad(range(100, 136), amp=0.16)
-for bar in range(100, 136, 4):                            # 4마디마다 임팩트 강조
-    place(mix, noise_impact(amp=0.32, seed=700 + bar), bar_time(bar))
-# 파이널 후반 블립 카운터모티프(퍼즐 승리감)
-lay_blip_arp(range(116, 132), amp=0.14, dense=False)
+# 100-135 파이널 (최대 에너지, +2 키업, 36마디) ★뒤 1/3 키업
+for bar in range(100, 136):
+    four_on_floor(bar, kamp=0.92, punch=54)
+    claps(bar, amp=0.50)
+    hats(bar, amp=0.16); open_hats(bar, amp=0.34)
+    lay_fb_chop(fb, bar, amp=0.58, bright=9200)
+lay_bass(range(100, 136), amp=0.64)
+lay_bell(range(100, 136), amp=0.26, dense=True)
+for bar in range(100, 136, 4):
+    place(fx, noise_impact(0.4, amp=0.30, seed=700 + bar), bar_time(bar))
 
-# 136-139 아웃트로 (자연 마무리)
-lay_drums(range(136, 139), with_clap=False, hat=0.10)
-lay_bass(range(136, 139), amp=0.8)
-lay_bell(range(136, 139), amp=0.18)
-lay_pad(range(136, 140), amp=0.36)
-place(mix, hard_kick(amp=1.0, drive=1.4, punch=50), bar_time(139, 0)); kick_times.append(bar_time(139, 0))
-place(mix, noise_impact(dur=1.2, amp=0.75, seed=99), bar_time(139, 0))
-for mi in ch(139)["tones"]:                               # 최종 코드 링아웃
-    place(amb, pad(mi, BAR * 1.5, amp=0.34, a=0.05, r=1.2, fc=2600), bar_time(139, 0))
+# 136-139 아웃트로 (자연 마무리 = 파이널 히트 + 코드 링아웃, 루프 폐기)
+for bar in range(136, 139):
+    halftime_kick(bar, kamp=0.7)
+    lay_fb_chop(fb, bar, amp=0.30, bright=6000, closed=True)
+lay_bass(range(136, 139), amp=0.5, whole=True)
+place(drums, hard_kick(0.4, amp=1.0, punch=50, drive=1.4), bar_time(139, 0)); kick_times.append(bar_time(139, 0))
+place(fx, noise_impact(1.6, amp=0.8, seed=99), bar_time(139, 0))
+for mi in ch(139)["tones"]:                      # 파이널 코드 홀드(링아웃)
+    place(amb, pad(mi, BAR * 0.98, amp=0.5, a=0.02, r=0.9, fc=2200), bar_time(139))
+    place(fb, super_saw_lead(m2f(mi), BAR * 0.9, amp=0.10, bright=7000), bar_time(139))
 
-# ── 사이드체인 + 믹스 (ep3 체인: sidechain → softclip → limiter) ──────────
-kick_times = sorted(set(kick_times))
+# ═══ 믹스 + 사이드체인 펌프 (템플릿 mix chain: sidechain → softclip → limiter) ═══
+kick_times = sorted(set(kt for kt in kick_times if kt < DUR))
 duck = sidechain_env(N, kick_times, depth=0.62, attack=0.002, release=0.11)
-melodic *= duck
-amb = reverb(amb, mix=0.28, decay=0.70)                   # 앰비언트 공간감
-amb *= (0.7 + 0.3 * duck)                                 # 앰비언트 약펌프
-master = mix * 0.85 + melodic * 0.95 + amb * 0.65
-master = soft_clip(master, drive=1.02)
-master = limiter(master, ceiling=0.92)
+fb *= duck; lead *= duck; sub *= (0.5 + 0.5 * duck)
+amb *= (0.75 + 0.25 * duck)                       # 엠비언트 살짝만 펌프
 
-# 자연 엔딩(루프 아님): 인트로 마이크로 페이드 + 아웃트로 링아웃 페이드
-si = int(0.005 * SR); master[:si] *= np.linspace(0, 1, si)
-of = int(1.0 * SR); master[-of:] *= np.linspace(1, 0, of) ** 0.8
+# 엠비언트에 Schroeder 리버브(우주 공간감)
+amb = reverb(amb, mix=0.28, decay=0.72)
 
-# ── 메트릭 ────────────────────────────────────────────────────────────────
+# 버스 카빙(마스킹·머드 제거) — 서브=저역 전담, 코드찹/벨/패드=중고역
+fb = hp(fb, 200, order=2)
+lead = hp(lead, 340, order=2)
+amb = hp(amb, 110, order=2)
+sub = hp(sub, 30, order=2); sub = lp(sub, 180, order=4)
+drums_sub = lp(drums, 120, order=2); drums_hi = hp(drums, 120, order=2)
+
+# 코드찹·벨 새추레이션(중고역 존재감, exciter)
+fb = fb * 0.75 + soft_clip(fb * 1.5, 1.35) * 0.25
+lead = lead * 0.8 + soft_clip(lead * 1.4, 1.3) * 0.2
+
+# 레벨 합성 (코스믹 = 코드찹/벨/패드 전경, 서브 억제)
+master = fb * 1.9 + lead * 1.6 + sub * 0.42 + drums_sub * 0.62 + drums_hi * 0.85 + amb * 0.85 + fx * 0.55
+
+master = soft_clip(master, drive=1.03)
+master = limiter(master, ceiling=0.94)
+
+# ★엔딩(루프 폐기): 인트로 마이크로 페이드 + 아웃트로 1.4s 링아웃 페이드
+xf = int(0.005 * SR); master[:xf] *= np.linspace(0, 1, xf)
+of = int(1.4 * SR);   master[-of:] *= np.linspace(1, 0, of) ** 0.8
+
+# ═══ 메트릭 ═══════════════════════════════════════════════════════════
 def rms_db(a): return 20 * np.log10(np.sqrt(np.mean(a ** 2)) + 1e-9)
 peak = float(np.max(np.abs(master)))
-clipc = int(np.sum(np.abs(master) > 0.999))
+clipn = int(np.sum(np.abs(master) > 0.999))
 nan = bool(np.any(~np.isfinite(master)))
-print(f"[i] peak={peak:.4f} rms={rms_db(master):.2f}dB clip>0.999={clipc} nan={nan}")
-SECTIONS = {'intro': (0, 4), 'build': (4, 12), 'verseA': (12, 28), 'chorusA': (28, 44),
-            'break1': (44, 52), 'build2': (52, 56), 'chorusB': (56, 72), 'verseB': (72, 88),
-            'break2': (88, 96), 'build3': (96, 100), 'final': (100, 136), 'outro': (136, 140)}
+print(f"[i] peak={peak:.4f} rms={rms_db(master):.2f}dB clip>0.999={clipn} nan={nan} N={N} dur={N/SR:.6f}s")
+SECS = {'intro':(0,4),'build':(4,12),'verseA':(12,28),'chorusA':(28,44),'break1':(44,52),
+        'build2':(52,56),'chorusB':(56,72),'verseB':(72,88),'break2':(88,96),
+        'build3':(96,100),'final':(100,136),'outro':(136,140)}
 sec_rms = {}
-for name, (b0, b1) in SECTIONS.items():
-    i0, i1 = int(b0 * BAR * SR), int(b1 * BAR * SR)
+for name, (b0, b1) in SECS.items():
+    i0, i1 = int(round(b0 * BAR * SR)), int(round(b1 * BAR * SR))
     sec_rms[name] = rms_db(master[i0:i1])
     print(f"    {name:<9} {sec_rms[name]:6.2f} dB")
 
-# ── 저장 (스테레오 int16 44100) ───────────────────────────────────────────
+# 하드 요건 체크
+print(f"[chk] peak<1.0 & clip==0 : {bool(peak < 1.0 and clipn == 0)}")
+print(f"[chk] nan==False         : {bool(nan == False)}")
+print(f"[chk] N==7056000         : {bool(N == 7056000)}")
+print(f"[chk] final>verseA       : {bool(sec_rms['final'] > sec_rms['verseA'])} (final {sec_rms['final']:.2f} vs verseA {sec_rms['verseA']:.2f})")
+print(f"[chk] break1<chorusA&B   : {bool(sec_rms['break1'] < sec_rms['chorusA'] and sec_rms['break1'] < sec_rms['chorusB'])}")
+print(f"[chk] break2<chorusB&fin : {bool(sec_rms['break2'] < sec_rms['chorusB'] and sec_rms['break2'] < sec_rms['final'])}")
+
+# ═══ WAV 출력 (stereo int16 44100) ═══
 stereo = np.stack([master, master], 1)
 i16 = np.clip(stereo * 32767, -32768, 32767).astype(np.int16)
 out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hyak_ep6_fullver.wav")
 with wave.open(out, "wb") as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes(i16.tobytes())
-print(f"[OK] saved {out} ({N} spl, {N / SR:.6f}s)")
-
-# ── HARD REQUIREMENTS 자체 점검 ───────────────────────────────────────────
-print("\n[CHECK]")
-print(f"  peak<1.0 & clip==0     : {'PASS' if peak < 1.0 and clipc == 0 else 'FAIL'} (peak={peak:.4f}, clip={clipc})")
-print(f"  nan==False             : {'PASS' if not nan else 'FAIL'}")
-print(f"  N==7056000 (160.0s)    : {'PASS' if N == 7056000 else 'FAIL'} (N={N})")
-asc = sec_rms['final'] > sec_rms['verseA']
-dip1 = sec_rms['break1'] < sec_rms['chorusA'] and sec_rms['break1'] < sec_rms['chorusB']
-dip2 = sec_rms['break2'] < sec_rms['chorusB'] and sec_rms['break2'] < sec_rms['final']
-print(f"  final>verseA           : {'PASS' if asc else 'FAIL'} ({sec_rms['final']:.2f}>{sec_rms['verseA']:.2f})")
-print(f"  breaks dip < chorus    : {'PASS' if dip1 and dip2 else 'FAIL'} "
-      f"(b1={sec_rms['break1']:.2f} b2={sec_rms['break2']:.2f} chA={sec_rms['chorusA']:.2f} chB={sec_rms['chorusB']:.2f})")
+print(f"[OK] saved {out} ({N} spl, {N/SR:.6f}s)")

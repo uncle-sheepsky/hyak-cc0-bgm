@@ -17,11 +17,11 @@ All six tracks are **fully original compositions**. (The ep2 "Tetris" track is a
 
 | # | File | Theme | Length | BPM | Key / progression | Notes |
 |---|------|-------|--------|-----|-------------------|-------|
-| 1 | `hyak-ep1-teaser` | Teaser | 2:40 | 180 | A minor · Am–F–C–G | Hard EDM / 전파 |
+| 1 | `hyak-ep1-rhythm` | Rhythm game | 2:40 | 180 | A minor · Am–F–C–G | Hard EDM / 전파 |
 | 3 | `hyak-ep3-suika` | Suika (fruit merge) | 2:40 | 180 | D minor · Dm–B♭–C–A | Original |
 | 4 | `hyak-ep4-blackhole` | Black hole | 2:38 | 200 | E minor · Em–G–D–Am (i–♭III–♭VII–iv) | Halftime / futurebase |
-| 5 | `hyak-ep5-galaxy` | Galaxy collision | 2:40 | 210 | F major · FM7–G7–Em7–Am7 (Royal Road) | Cosmic / ambient, +2 key-up |
-| 6 | `hyak-ep6-2048` | 2048 | 2:40 | 210 | A harmonic minor · Am–G–F–E | +2 key-up |
+| 5 | `hyak-ep5-2048` | 2048 | 2:40 | 210 | A harmonic minor · Am–G–F–E | +2 key-up |
+| 6 | `hyak-ep6-galaxy` | Galaxy collision | 2:40 | 210 | F major · FM7–G7–Em7–Am7 (Royal Road) | Cosmic / ambient, +2 key-up |
 | 7 | `hyak-ep7-danmaku` | Bullet-hell dodge | 2:40 | 210 | C major · C–G–Am–F (I–V–vi–IV) | Kawaii futurebase, true stereo |
 
 All tracks are complete standalone songs (intro → builds → choruses → breakdowns → final → natural ending) — **not loops**. The shorter loop edits used in the videos are separate.
