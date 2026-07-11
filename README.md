@@ -1,6 +1,6 @@
-# hyak — CC0 BGM Pack (ep1–ep7 full versions)
+# hyak — CC0 BGM Pack (full versions)
 
-Original background music from the **hyak** YouTube channel ("에펙 없이 코드로 / how far can code go without After Effects"), released into the public domain under **CC0 1.0**.
+Original background music from the **hyak** YouTube channel ("에펙 없이 코드로 / how far can code go without After Effects"), released into the public domain under **CC0 1.0**. Six fully-original tracks (ep1, 3, 4, 5, 6, 7).
 
 Every track is **100% synthesized in code** (Python + NumPy/SciPy) — no external audio samples, no paid libraries, no VSTs. The music *is* code: the exact builder script for each track is in [`src/`](src/). Run it, and it regenerates the track bit-for-bit (deterministic).
 
@@ -13,10 +13,11 @@ Every track is **100% synthesized in code** (Python + NumPy/SciPy) — no extern
 
 Each track ships as **FLAC** (lossless, in [`flac/`](flac/)) and **MP3 320 kbps** ([`mp3/`](mp3/)).
 
+All six tracks are **fully original compositions**. (The ep2 "Tetris" track is an arrangement of an existing folk tune and is **not** part of this CC0 release — see below.)
+
 | # | File | Theme | Length | BPM | Key / progression | Notes |
 |---|------|-------|--------|-----|-------------------|-------|
 | 1 | `hyak-ep1-teaser` | Teaser | 2:40 | 180 | A minor · Am–F–C–G | Hard EDM / 전파 |
-| 2 | `hyak-ep2-tetris` | Tetris | 2:40 | 180 | E minor · Em–B–Am | Melody = **"Korobeiniki"** (public-domain Russian folk); arrangement original |
 | 3 | `hyak-ep3-suika` | Suika (fruit merge) | 2:40 | 180 | D minor · Dm–B♭–C–A | Original |
 | 4 | `hyak-ep4-blackhole` | Black hole | 2:38 | 200 | E minor · Em–G–D–Am (i–♭III–♭VII–iv) | Halftime / futurebase |
 | 5 | `hyak-ep5-galaxy` | Galaxy collision | 2:40 | 210 | F major · FM7–G7–Em7–Am7 (Royal Road) | Cosmic / ambient, +2 key-up |
@@ -45,9 +46,12 @@ Rendering is deterministic — same script, same bytes (verified via SHA-256).
 
 ## Provenance & licensing basis
 
-- **Tracks 1, 3, 4, 5, 6, 7** — fully original compositions, synthesized entirely in code. No third-party material.
-- **Track 2 (Tetris)** — the melody is **"Korobeiniki,"** a traditional Russian folk tune in the public domain; the arrangement, harmony, drums, and synthesis are all original code. (This track does **not** use any copyrighted Tetris-brand assets — "Tetris" is a trademark of The Tetris Company and is referenced here only to describe the episode theme, not claimed.)
+- **All six released tracks (ep1, 3, 4, 5, 6, 7)** — fully original compositions, synthesized entirely in code. No third-party material.
 - **Track 7 (Danmaku)** — a fully original, code-synthesized track (an adaptation of the author's own composition from a sibling project). It contains **no material from Touhou Project or any third party**; the episode video is fan work, but this music stands on its own and is CC0.
+
+### Excluded from this CC0 release
+
+- **ep2 (Tetris)** is deliberately **not** included. Its melody is an arrangement of **"Korobeiniki"** — a public-domain Russian folk tune, but one strongly associated with the Tetris brand. To keep this release unambiguous and worry-free for anyone who reuses it, we only dedicate **fully original compositions** to the public domain. The ep2 arrangement remains all-rights-reserved by hyak.
 
 The author (**hyak**) is the sole rights holder of these compositions and dedicates them to the public domain via CC0 1.0.
 

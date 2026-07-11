@@ -13,8 +13,6 @@
 FLAC(무손실) + MP3 320 모두 제공.
 👉 https://github.com/uncle-sheepsky/hyak-cc0-bgm/releases/tag/v1
 
-*ep2는 퍼블릭 도메인 러시아 민요 「코로베이니키」를 자체 편곡했습니다.*
-
 ---
 
 ## English
@@ -24,9 +22,7 @@ FLAC(무손실) + MP3 320 모두 제공.
 Every track is **synthesized entirely in code** — no external samples, no paid libraries. Use them **anywhere, no attribution needed**: videos, games, streams, commercial work. The builder scripts are included too — run them and the tracks regenerate exactly.
 
 FLAC (lossless) + MP3 320 provided.
-👉 https://github.com/uncle-sheepsky/hyak-cc0-bgm/releases/tag/v1
-
-*ep2's melody is "Korobeiniki," a public-domain Russian folk tune, in an original arrangement.*
+👉 https://github.com/uncle-sheepsky/hyak-cc0-bgm/releases/tag/v1*
 
 ---
 

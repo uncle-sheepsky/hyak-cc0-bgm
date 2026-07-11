@@ -1,9 +1,8 @@
-# CC0 BGM Pack — integrity manifest
-# generated 2026-07-11T10:57:40Z
+# CC0 BGM Pack — integrity manifest (6 tracks; ep2 excluded)
+# ep2(Tetris/Korobeiniki arrangement) excluded from CC0 release — original compositions only.
 
 ## durations (seconds)
 hyak-ep1-teaser.flac         160.000000
-hyak-ep2-tetris.flac         160.000000
 hyak-ep3-suika.flac          160.000000
 hyak-ep4-blackhole.flac      158.400000
 hyak-ep5-galaxy.flac         160.000000
@@ -12,7 +11,6 @@ hyak-ep7-danmaku.flac        160.000000
 
 ## sha256 (flac)
 ce1d3282d3f7f43161158c5ca1c465ab7266eb6f281213d543bfcf47ddc81316 *flac/hyak-ep1-teaser.flac
-8de690e6a2a2b8a7e34137ddaf0c701f207e71c98ca020b9b02d3049c25858c8 *flac/hyak-ep2-tetris.flac
 37dabeac19d33d30196e8b5898aff51983146a652f4265a81217026b06e2dcf4 *flac/hyak-ep3-suika.flac
 acd5072a9861d9db8c6214badc0aff9922ad2b7ab0d82af6f9477093b86e6662 *flac/hyak-ep4-blackhole.flac
 0a3510d9016805f9f5f291314b3fff31ac11bbac14a1bae2067533140b4ab608 *flac/hyak-ep5-galaxy.flac
@@ -20,7 +18,6 @@ acd5072a9861d9db8c6214badc0aff9922ad2b7ab0d82af6f9477093b86e6662 *flac/hyak-ep4-
 a0e3536cfbd91337a1dff466c50f66a7a1eb1390c4900b27fc146188d3b83265 *flac/hyak-ep7-danmaku.flac
 ## sha256 (mp3)
 843ddc7ba6f90c0121334f4749b565b8f3f2dac0bec4ec8df10dabd62006b6d1 *mp3/hyak-ep1-teaser.mp3
-8cf7d5f319a3c0d2864760856710e8eab89dde4f92bc4c9c4dfdec1287714b87 *mp3/hyak-ep2-tetris.mp3
 fb684210e4dbe26b80928d07c02a6948699eb669397c760b68a7618c5165aadd *mp3/hyak-ep3-suika.mp3
 ac50a39d42691f6c4f8433ac5496ea2ce5ea406570faa067ef578b39dda68743 *mp3/hyak-ep4-blackhole.mp3
 e7f5a16ea93b6bae64658b01f05a8705b1083ad83df22029e20619d94de21fe0 *mp3/hyak-ep5-galaxy.mp3
