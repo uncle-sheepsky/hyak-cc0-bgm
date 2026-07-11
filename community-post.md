@@ -11,7 +11,7 @@
 전부 **코드로만 합성**한 오리지널 곡이에요(외부 샘플·유료 라이브러리 0). 영상·게임·방송·상업 프로젝트 어디든 **출처 표기 없이 자유롭게** 쓰세요. 만든 코드(빌더 .py)도 같이 올려뒀습니다 — 돌리면 곡이 그대로 재생성돼요.
 
 FLAC(무손실) + MP3 320 모두 제공.
-👉 (GitHub 릴리스 링크)
+👉 https://github.com/uncle-sheepsky/hyak-cc0-bgm/releases/tag/v1
 
 *ep2는 퍼블릭 도메인 러시아 민요 「코로베이니키」를 자체 편곡했습니다.*
 
@@ -24,7 +24,7 @@ FLAC(무손실) + MP3 320 모두 제공.
 Every track is **synthesized entirely in code** — no external samples, no paid libraries. Use them **anywhere, no attribution needed**: videos, games, streams, commercial work. The builder scripts are included too — run them and the tracks regenerate exactly.
 
 FLAC (lossless) + MP3 320 provided.
-👉 (GitHub release link)
+👉 https://github.com/uncle-sheepsky/hyak-cc0-bgm/releases/tag/v1
 
 *ep2's melody is "Korobeiniki," a public-domain Russian folk tune, in an original arrangement.*
 

@@ -55,6 +55,6 @@ The author (**hyak**) is the sole rights holder of these compositions and dedica
 
 ## Channel
 
-▶ hyak — *(YouTube channel link — fill in)*
+▶ hyak — https://www.youtube.com/@Hyak-y0m
 
 Made with Claude + code, no After Effects.
