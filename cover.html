@@ -1,0 +1,89 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1280px; height:1280px; }
+  body {
+    background:#070a10;
+    color:#e8edf5;
+    font-family: "Consolas","DejaVu Sans Mono","Courier New",monospace;
+    position:relative; overflow:hidden;
+  }
+  /* faint grid */
+  .grid { position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(80,200,255,.045) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(80,200,255,.045) 1px,transparent 1px);
+    background-size:48px 48px; }
+  .glowtop { position:absolute; left:-200px; top:-260px; width:900px; height:900px;
+    background:radial-gradient(circle,rgba(60,220,255,.20),transparent 62%); filter:blur(8px); }
+  .glowbot { position:absolute; right:-240px; bottom:-300px; width:900px; height:900px;
+    background:radial-gradient(circle,rgba(255,70,180,.18),transparent 62%); filter:blur(8px); }
+  .wrap { position:relative; padding:84px 88px; height:100%; display:flex; flex-direction:column; }
+
+  .top { display:flex; justify-content:space-between; align-items:flex-start; }
+  .brand { font-size:104px; font-weight:800; letter-spacing:-3px; line-height:.9;
+    background:linear-gradient(90deg,#5fe6ff,#b98cff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .tag { margin-top:14px; font-size:23px; color:#8ea3c0; letter-spacing:1px; }
+  .badge { text-align:right; }
+  .cc0 { font-size:96px; font-weight:800; color:#0a0e14;
+    background:linear-gradient(135deg,#7dffce,#3ce0ff); padding:6px 30px 12px; border-radius:20px;
+    box-shadow:0 0 40px rgba(60,224,255,.45); display:inline-block; letter-spacing:-2px; }
+  .cc0sub { margin-top:14px; font-size:22px; color:#7dffce; letter-spacing:3px; }
+
+  .headline { margin-top:66px; font-size:46px; font-weight:700; line-height:1.25; }
+  .headline .hl { color:#5fe6ff; }
+  .sub2 { margin-top:16px; font-size:26px; color:#9fb2cd; }
+
+  .tracks { margin-top:52px; display:flex; flex-direction:column; gap:0; }
+  .trk { display:flex; align-items:center; padding:19px 4px; border-bottom:1px solid rgba(120,150,190,.15); }
+  .trk .no { width:70px; color:#ff5cc0; font-weight:700; font-size:30px; }
+  .trk .nm { flex:1; font-size:33px; font-weight:600; letter-spacing:1px; }
+  .trk .meta { font-size:25px; color:#7f93b1; letter-spacing:1px; }
+
+  .foot { margin-top:auto; display:flex; justify-content:space-between; align-items:flex-end; }
+  .foot .fmt { font-size:27px; color:#cddcf0; }
+  .foot .fmt b { color:#7dffce; }
+  .foot .url { font-size:22px; color:#6f80a0; white-space:nowrap; }
+  .waves { display:flex; gap:5px; align-items:flex-end; height:56px; margin-top:14px; }
+  .waves i { width:7px; background:linear-gradient(#5fe6ff,#b98cff); border-radius:3px; display:block; }
+</style></head>
+<body>
+  <div class="grid"></div><div class="glowtop"></div><div class="glowbot"></div>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div class="brand">hyak</div>
+        <div class="tag">CODE-SYNTHESIZED BGM · 에펙 없이 코드로</div>
+      </div>
+      <div class="badge">
+        <div class="cc0">CC0</div>
+        <div class="cc0sub">PUBLIC DOMAIN</div>
+      </div>
+    </div>
+
+    <div class="headline">6 original BGM tracks,<br><span class="hl">free for anything</span> — no attribution.</div>
+    <div class="sub2">100% synthesized in code. No samples, no paid libraries.</div>
+
+    <div class="tracks">
+      <div class="trk"><span class="no">ep1</span><span class="nm">TEASER</span><span class="meta">180 · Am · hard EDM</span></div>
+      <div class="trk"><span class="no">ep3</span><span class="nm">SUIKA</span><span class="meta">180 · Dm</span></div>
+      <div class="trk"><span class="no">ep4</span><span class="nm">BLACK HOLE</span><span class="meta">200 · Em · futurebase</span></div>
+      <div class="trk"><span class="no">ep5</span><span class="nm">GALAXY</span><span class="meta">210 · F · cosmic</span></div>
+      <div class="trk"><span class="no">ep6</span><span class="nm">2048</span><span class="meta">210 · Am</span></div>
+      <div class="trk"><span class="no">ep7</span><span class="nm">DANMAKU</span><span class="meta">210 · C · kawaii</span></div>
+    </div>
+
+    <div class="foot">
+      <div>
+        <div class="fmt"><b>FLAC</b> + <b>MP3</b> 320 · builder code included</div>
+        <div class="waves" id="waves"></div>
+      </div>
+      <div class="url">github.com/uncle-sheepsky/hyak-cc0-bgm</div>
+    </div>
+  </div>
+  <script>
+    // static deterministic waveform bars (seeded, no animation)
+    const H=[18,34,52,28,44,56,24,40,50,30,46,54,20,38,48,32,42,56,26,36];
+    const w=document.getElementById('waves');
+    for(let k=0;k<40;k++){const i=document.createElement('i');i.style.height=H[k%H.length]+'px';w.appendChild(i);}
+  </script>
+</body></html>
