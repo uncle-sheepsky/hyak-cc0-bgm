@@ -1,3 +1,6 @@
+> 📦 **통합 안내 / Unified** — 이 채널 음원은 [**duru-ai-cc0-bgm**](https://github.com/uncle-sheepsky/duru-ai-cc0-bgm) 단일 CC0 팩으로 통합되었습니다. 이 repo 파일은 기존 링크 유지를 위해 그대로 둡니다.
+> Now unified into **duru-ai-cc0-bgm** — files here are kept so existing links keep working.
+
 # hyak — CC0 BGM Pack (full versions)
 
 Original background music from the **hyak** YouTube channel ("에펙 없이 코드로 / how far can code go without After Effects"), released into the public domain under **CC0 1.0**. Six fully-original tracks (ep1, 3, 4, 5, 6, 7).
