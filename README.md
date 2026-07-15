@@ -3,6 +3,16 @@
 
 # hyak — CC0 BGM Pack (full versions)
 
+> ## ⚠️ This pack has moved
+> This repo is superseded by the unified pack: **<https://github.com/uncle-sheepsky/duru-ai-cc0-bgm>**
+> (17 tracks, MP3 320k + build scripts, one zip release, actively maintained).
+>
+> **License update (2026-07-15):** the rights holder has since **re-dedicated the ep2 "Korobeiniki"
+> arrangement to the public domain under CC0 1.0** as part of the unified pack
+> (`hyak-ep2-korobeiniki-tetris`). The "excluded from this CC0 release" note below is kept only as
+> a historical record of this repo's original scope — the unified repo's CC0 grant is the current,
+> authoritative license for that track.
+
 Original background music from the **hyak** YouTube channel ("에펙 없이 코드로 / how far can code go without After Effects"), released into the public domain under **CC0 1.0**. Six fully-original tracks (ep1, 3, 4, 5, 6, 7).
 
 Every track is **100% synthesized in code** (Python + NumPy/SciPy) — no external audio samples, no paid libraries, no VSTs. The music *is* code: the exact builder script for each track is in [`src/`](src/). Run it, and it regenerates the track bit-for-bit (deterministic).
